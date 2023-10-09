@@ -1,0 +1,54 @@
+$namespace: "xm" !default; // 命名空间
+$block-sel: "-" !default; // block 用 - 连接
+$element-sel: "__" !default; // element 用 __ 连接
+$modify-sel: "--" !default; // modify 用 -- 连接。      如 xm-page__button--primary
+
+// 生成 block 的规范类，如 .xm-block{}
+@mixin b($block) {
+  $B: #{$namespace + $block-sel + $block};
+  .#{$B} {
+    // 这里类似于 插槽的功能，把对应的样式填进来
+    @content;
+  }
+}
+
+// 生成 element 的规范类，如 .xm-block__inner{}
+@mixin e($el) {
+  // 首先，要先获取父级的类名，使用 &，对应的就是 .xm-block
+  $selector: &;
+
+  // 拼接出来是 .xm-block__inner{}
+  // 但编译出来的 会是  .xm-block .xm-block__inner{}
+  // #{$selector + $element-sel + $el} {
+  //   @content;
+  // }
+
+  // 如果不想要父级名称，只需要 .xm-block__inner{}，则使用 @at-root
+  @at-root {
+    #{$selector + $element-sel + $el} {
+      @content;
+    }
+  }
+}
+
+// 生成 modify 的规范类，如 .xm-block__inner--primary{}
+@mixin m($mod) {
+  $selector: &;
+
+  @at-root {
+    #{$selector + $modify-sel + $mod} {
+      @content;
+    }
+  }
+}
+
+// bfc
+@mixin bfc {
+  overflow: hidden;
+  height: 100%;
+}
+
+// flex
+@mixin flex {
+  display: flex;
+}

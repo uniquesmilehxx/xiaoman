@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>模拟响应式源码的实现</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      import { reactive } from "../utils/reactive.js";
+      import { effect } from "../utils/effect.js";
+      import { computed } from "../utils/computed.js";
+
+      const user = reactive({
+        name: "小满",
+        age: 18,
+        // 深层对象
+        foo: {
+          bar: {
+            hobby: "swim",
+          },
+        },
+      });
+
+      window.a = reactive({
+        name: "a",
+        age: 10,
+      });
+      window.b = computed(() => {
+        console.log("重新计算");
+        return a.age + 100;
+      });
+
+      effect(() => {
+        document.querySelector(
+          "#app"
+        ).innerHTML = `${user.name} - ${user.age} - ${user.foo.bar.hobby}`;
+      });
+
+      setTimeout(() => {
+        user.name = "blue";
+
+        setTimeout(() => {
+          // 现有 reactive 无法满足深层数据的响应式，reactive 改造为深层递归
+          user.foo.bar.hobby = "123";
+        }, 3000);
+      }, 2000);
+    </script>
+  </body>
+</html>
